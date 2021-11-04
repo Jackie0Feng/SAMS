@@ -1,7 +1,7 @@
 /*程序功能:   学生成绩管理
 编码者:   JackieFeng
 日期:  30/10/2021
-版本号:1.0
+版本号:1.1
 备注：
 某班有最多不超过30人(具体人数由键盘输入）国实现如下学生成绩管理:用一维数组作区函数参数编程实现如下学生成绩管理：
 (1)录入每个学生的学号和考试成绩；
@@ -123,12 +123,12 @@ void DeSortbyScore(long num[], float score[], int n)//选择排序
 {
     long nTemp;
     float sTemp;
-    int max=0;//最大位索引值，初试为1
     //选择排序，第一层循环整个数组，每次归一位
     for (int i = 0; i < n-1; i++)
     {
+        int max = i;//最大位索引值，每次初始化为乱序区第一位
         //第二层循环乱序位，每次从乱序列中选择最大一位
-        for (int j = i; j < n; j++)
+        for (int j = i+1; j < n; j++)
         {
             if (score[max] < score[j])
             {
@@ -153,12 +153,12 @@ void AsSortbyNum(long num[], float score[], int n)
 {
     long nTemp;
     float sTemp;
-    int min = 0;//最大位索引值，初试为1
     //选择排序，第一层循环整个数组，每次归一位
     for (int i = 0; i < n - 1; i++)
     {
+        int min = i;//最小位索引值，每次初始化为乱序区第一位
         //第二层循环乱序位，每次从乱序列中选择学号最小的一位
-        for (int j = i; j < n; j++)
+        for (int j = i+1; j < n; j++)
         {
             if (num[min] > num[j])
             {
