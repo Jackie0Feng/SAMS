@@ -39,7 +39,7 @@ int AverSumofScore(float score[], int n);
     score[]:分数
     n:总人数
 返回:
-备注：已弃用，被使用函数指针参数的SortbyScore取用*/
+备注：已弃用，被使用函数指针参数的SortbyScore替用*/
 void DeSortbyScore(long num[], float score[], int n);
 
 /*
@@ -79,8 +79,19 @@ int Descending(int a, int b);
     score[]:分数
     n:总人数
 返回:
-备注：*/
+备注：已弃用，被使用函数指针参数的SortbyNum替用*/
 void AsSortbyNum(long num[], float score[], int n);
+/*
+函数名称:   SortbyNum
+功能描述:   按照学号升序排列
+参数:
+    num[]:学号
+    score[]:分数
+    n:总人数
+    *compare：比较函数指针
+返回:
+备注*/
+void SortbyNum(long num[], float score[], int n, int(*compare)(int a, int b));
 /*
 函数名称:   SearchbyNum
 功能描述:   按学号查询学生排名及其考试成绩
@@ -112,7 +123,24 @@ void StatistAnalysis( float score[], int n);
 返回：
 备注：*/
 void PrintScore(long num[], float score[],int n);
-
+/*
+函数名称:   FloatSwap
+功能描述:   交换两个浮点型变量
+参数:
+    a:float型指针
+    b:float型指针
+返回：
+备注：*/
+void FloatSwap(float* a, float* b);
+/*
+函数名称:   LongSwap
+功能描述:   交换两个长整型变量
+参数:
+    a:long型指针
+    b:long型指针
+返回：
+备注：*/
+void LongSwap(long* a, long* b);
 /*
 函数名称:   Mean
 功能描述:   显示菜单页面，提示用户如何使用

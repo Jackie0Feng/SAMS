@@ -50,7 +50,8 @@ int main()
             PrintScore(num, score, n);
             break;
         case 5://按学号升序排名
-            AsSortbyNum(num, score, n);
+            //AsSortbyNum(num, score, n);
+            SortbyNum(num, score, n, Ascending);
             printf("Ascendingly scorted by num:\n");
             PrintScore(num, score, n);
             break;
@@ -130,12 +131,12 @@ void DeSortbyScore(long num[], float score[], int n)//选择排序
 {
     long nTemp;
     float sTemp;
-    int max=0;//最大位索引值，初始为第一位
     //选择排序，第一层循环整个数组，每次归一位
     for (int i = 0; i < n-1; i++)
     {
+        int max = i;//最大位索引值，初始为乱序区第一位
         //第二层循环乱序位，每次从乱序列中选择最大一位
-        for (int j = i; j < n; j++)
+        for (int j = i+1; j < n; j++)
         {
             if (score[max] < score[j])
             {
@@ -160,10 +161,10 @@ void SortbyScore(long num[], float score[], int n, int(*compare)(int a, int b))
 {
     long nTemp;
     float sTemp;
-    int cmp = 0;//比较位索引值，初始为第一位
     //选择排序，第一层循环整个数组，每次归一位
     for (int i = 0; i < n - 1; i++)
     {
+        int cmp = i;//比较位索引值，初始为乱序区第一位
         //第二层循环乱序位，每次从乱序列中选择最大一位
         for (int j = i; j < n; j++)
         {
@@ -175,37 +176,33 @@ void SortbyScore(long num[], float score[], int n, int(*compare)(int a, int b))
         //发生改变，交换
         if (i != cmp)
         {
-            nTemp = num[i];
-            num[i] = num[cmp];
-            num[cmp] = nTemp;
+            LongSwap(&num[i], &num[cmp]);
 
-            sTemp = score[i];
-            score[i] = score[cmp];
-            score[cmp] = sTemp;
+            FloatSwap(&score[i], &score[cmp]);
         }
     }
 }
 
 int Ascending(int a, int b)
 {
-    return a<b;
+    return a>b;
 }
 
 int Descending(int a, int b)
 {
-    return a>b;
+    return a<b;
 }
 
 void AsSortbyNum(long num[], float score[], int n)
 {
     long nTemp;
     float sTemp;
-    int min = 0;//最大位索引值，初试为1
     //选择排序，第一层循环整个数组，每次归一位
     for (int i = 0; i < n - 1; i++)
     {
+        int min = i;//最大位索引值，初试为乱序区第一位
         //第二层循环乱序位，每次从乱序列中选择学号最小的一位
-        for (int j = i; j < n; j++)
+        for (int j = i+1; j < n; j++)
         {
             if (num[min] > num[j])
             {
@@ -222,6 +219,32 @@ void AsSortbyNum(long num[], float score[], int n)
             sTemp = score[i];
             score[i] = score[min];
             score[min] = sTemp;
+        }
+    }
+}
+
+void SortbyNum(long num[], float score[], int n, int(*compare)(int a, int b))
+{
+    long nTemp;
+    float sTemp;
+    //选择排序，第一层循环整个数组，每次归一位
+    for (int i = 0; i < n - 1; i++)
+    {
+        int cmp = i;//最大位索引值，初试为乱序区第一位
+        //第二层循环乱序位，每次从乱序列中选择学号最小的一位
+        for (int j = i + 1; j < n; j++)
+        {
+            if ((*compare)(num[cmp], num[j]))
+            {
+                cmp = j;
+            }
+        }
+        //发生改变，交换
+        if (i != cmp)
+        {
+            LongSwap(&num[i], &num[cmp]);
+
+            FloatSwap(&score[i], &score[cmp]);
         }
     }
 }
@@ -281,4 +304,18 @@ void PrintScore(long num[], float score[], int n)
     {
         printf("%d      %f      \n", num[i], score[i]);
     }
+}
+
+void FloatSwap(float* a, float* b)
+{
+    float tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+void LongSwap(long* a, long* b)
+{
+    long tmp = *a;
+    *a = *b;
+    *b = tmp;
 }
