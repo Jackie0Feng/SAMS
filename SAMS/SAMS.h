@@ -39,8 +39,38 @@ int AverSumofScore(float score[], int n);
     score[]:分数
     n:总人数
 返回:
-备注：*/
+备注：已弃用，被使用函数指针参数的SortbyScore取用*/
 void DeSortbyScore(long num[], float score[], int n);
+
+/*
+函数名称:   SortbyScore
+功能描述:   按照成绩排列名次表,使用函数指针表达升降序
+参数:
+    num[]:学号
+    score[]:分数
+    n:总人数
+    *compare：比较函数指针
+返回:
+备注：*/
+void SortbyScore(long num[], float score[], int n, int (*compare)(int a, int b));
+/*
+函数名称:   Ascending
+功能描述:   升序比较函数
+参数:
+    a:比较数
+    b:比较数
+返回:a<b
+备注：*/
+int Ascending(int a, int b);
+/*
+函数名称:   Descending
+功能描述:   降序比较函数
+参数:
+    a:比较数
+    b:比较数
+返回:a>b
+备注：*/
+int Descending(int a, int b);
 /*
 函数名称:   AsSortbyNum
 功能描述:   按照学号升序排列
