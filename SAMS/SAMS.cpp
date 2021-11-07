@@ -1,19 +1,23 @@
 /*程序功能:   学生成绩管理
 编码者:   JackieFeng
-日期:  04/11/2021
-版本号:2.0
+日期:  05/11/2021
+版本号:3.0
 备注：
-某班有最多不超过30人(具体人数由键盘输入）参加某门课的考试:用一维数组和函数指针作为函数参数编程实现如下学生成绩管理：
-(1)录入每个学生的学号和考试成绩；
+某班有最多不超过30人(具体人数由键盘输入）参加某门课的考试，用二维字符数组作函数参数编程实现如下菜单驱动的学生成绩管理系统：
+(1)录入每个学生的学号，姓名和考试成绩；
 (2)计算课程的总分和平均分；
 (3)按成绩由高到低排出名次表；
 (4)按成绩由低到高排出名次表；
 (5)按学号由小到大排出成绩表；
-(6)按学号查询学生排名及其考试成绩；
-(7)按优秀(90- 100)、良好(80- 89)、中等(70-79)、及格(60- 69)、不及格（0-59)5个类别,统计每个类别的人数以及所占的百分比;
-(8)输出每个学生的学号、考试成绩，课程总分和平均分。*/
+(6)按姓名的字典顺序排出成绩表；
+(7)按学号查询学生排名及其考试成绩；
+(8)按姓名查询学生排名及其考试成绩；
+(9)按优秀(90- 100)、良好(80- 89)、中等(70-79)、及格(60- 69)、不及格（0-59)5个类别,统计每个类别的人数以及所占的百分比;
+(10)输出每个学生的学号、姓名，考试成绩，以及课程总分和平均分。*/
 #include <stdio.h>
 #include "SAMS.h"
+#include<string.h>
+//#pragma warning(disable : 4996)
 
 int main()
 {
@@ -25,53 +29,57 @@ int main()
     //初始数据
     int n = 5;
     long num[STU_NUM] = { 10001,10002,10003,10004,10005 };
+    char name[][MAX_LEN] = { "tom","jack","bill","amy","jackie" };
     float score[STU_NUM] = { 20.0,80.0,50.0,66.0,95.0 };
     Mean();//显示菜单
     //使用系统
     while (1)
     {
+        printf("Please enter your choice : \n");
         scanf_s("%d", &order);
+        getchar();//读走缓存里的回车符
         switch (order)
         {
         case 1://录入成绩
-            n = ReadScore(num, score, n);
+            //n = ReadScore(num, score, n);
+            n = ReadScore(num, name, score, n);
             break;
         case 2://求平均分和总分
             AverSumofScore(score, n);
             break;
         case 3://按成绩降序排名
-            SortbyScore(num, score, n, Descending);
+            SortbyScore(num, name, score, n, Descending);
             printf("Descendingly scorted by scores:\n");
-            PrintScore(num, score, n);
+            PrintScore(num, name, score, n);
             break;
         case 4://按成绩升序排名
-            SortbyScore(num, score, n, Ascending);
+            SortbyScore(num, name, score, n, Ascending);
             printf("Ascendingly scorted by scores:\n");
-            PrintScore(num, score, n);
+            PrintScore(num, name, score, n);
             break;
         case 5://按学号升序排名
             //AsSortbyNum(num, score, n);
-            SortbyNum(num, score, n, Ascending);
+            SortbyNum(num, name, score, n, Ascending);
             printf("Ascendingly scorted by num:\n");
-            PrintScore(num, score, n);
+            PrintScore(num, name, score, n);
             break;
-        case 6://按学号查询学生排名及其考试成绩
-        {//如果想在case标签初始化变量，必须加大括号{}
-            int rank = -1;//学生排名
-            int x;//被查询学号
-            printf("Please enter the student ID queried\n");
-            scanf_s("%d", &x);
-            DeSortbyScore(num, score, n);//先排序
-            rank = SearchbyNum(num, x, n);//即使排名也是所在数组的位置
-            printf("The student's rank is %d and his grade is %f\n", rank+1, score[rank]);//索引+1为排名
+        case 6://按姓名的字典顺序排出成绩表；
+            SortbyName(num, name, score, n);
+            printf("Dictionarily scorted by name:\n");
+            PrintScore(num, name, score, n);
             break;
-        }
-        case 7://按优秀(90- 100)、良好(80- 89)、中等(70-79)、及格(60- 69)、不及格（0-59)5个类别,
+        case 7://按学号查询学生排名及其考试成绩
+            SearchbyNum(num, name, score, n);
+            break;
+        case 8://按姓名查询学生排名及其考试成绩
+            SearchbyName(num, name, score, n);
+            break;
+        case 9://按优秀(90- 100)、良好(80- 89)、中等(70-79)、及格(60- 69)、不及格（0-59)5个类别,
                    //统计每个类别的人数以及所占的百分比;
             StatistAnalysis( score, n);
             break;
-        case 8://输出每个学生的学号、考试成绩，课程总分和平均分
-            PrintScore(num, score, n);
+        case 10://输出每个学生的学号、考试成绩，课程总分和平均分
+            PrintScore(num, name, score, n);
             AverSumofScore(score, n);
             break;
         case 0://退出系统
@@ -79,9 +87,9 @@ int main()
             return 0;
             break;
         default:
+            Mean();
             break;
         }
-        printf("Please enter your choice : \n");
     }
     return 0;
 }
@@ -93,11 +101,13 @@ int Mean(void)
     printf("3.Sort in descending order by score\n");
     printf("4.Sort in ascending order by score\n");
     printf("5.Sort in ascending order by number\n");
-    printf("6.Search by number\n");
-    printf("7.Statistic analysis\n");
-    printf("8.List record\n");
+    printf("6.Sort in dictionary order by name\n");
+    printf("7.Search by number\n");
+    printf("8.Search by name\n");
+    printf("9.Statistic analysis\n");
+    printf("10.List record\n");
     printf("0.Exit\n");
-    printf("Please enter your choice : \n");
+    printf("666.Show mean\n");
     return 0;
 }
 
@@ -111,6 +121,22 @@ int ReadScore(long num[], float score[],int n)
         i++;
         printf("正在录入第%d个学生的学号和成绩\n", i + 1);
         scanf_s("%ld%*c%f", &num[i], &score[i]);
+    } while (score[i] > 0 && i <= 30);
+    printf("录入完成总共录入%d人\n", i);
+    return i;
+}
+
+int ReadScore(long num[], char name[][MAX_LEN], float score[], int n)
+{
+    printf("正在录入学生信息...\n");
+    printf("成绩录入-1时结束录入\n");
+    int i = n-1;
+    do
+    {
+        i++;
+        printf("正在录入第%d个学生的学号,姓名和带小数点的成绩\n", i + 1);
+        //scanf("%ld%s%f", &num[i], name[i], &score[i]);//数值类型与字符串类型交叉输入可用空格隔开
+        scanf_s("%ld%s%f", &num[i], name[i],10, &score[i]);//scanf_s函数在输入字符串时必须指定字符串长度
     } while (score[i] > 0 && i <= 30);
     printf("录入完成总共录入%d人\n", i);
     return i;
@@ -168,7 +194,7 @@ void SortbyScore(long num[], float score[], int n, int(*compare)(int a, int b))
         //第二层循环乱序位，每次从乱序列中选择最大一位
         for (int j = i; j < n; j++)
         {
-            if ((*compare)(score[cmp], score[j]))
+            if (compare(score[cmp], score[j]))//函数名就是地址，所以直接使用指针也是正常工作
             {
                 cmp = j;
             }
@@ -183,14 +209,28 @@ void SortbyScore(long num[], float score[], int n, int(*compare)(int a, int b))
     }
 }
 
-int Ascending(int a, int b)
+void SortbyScore(long num[], char name[][MAX_LEN], float score[], int n, int(*compare)(int a, int b))
 {
-    return a>b;
-}
-
-int Descending(int a, int b)
-{
-    return a<b;
+    //选择排序，第一层循环整个数组，每次归一位
+    for (int i = 0; i < n - 1; i++)
+    {
+        int cmp = i;//比较位索引值，初始为乱序区第一位
+        //第二层循环乱序位，每次从乱序列中选择最大一位
+        for (int j = i; j < n; j++)
+        {
+            if (compare(score[cmp], score[j]))//函数名就是地址，所以直接使用指针也是正常工作
+            {
+                cmp = j;
+            }
+        }
+        //发生改变，交换
+        if (i != cmp)
+        {
+            LongSwap(&num[i], &num[cmp]);
+            CharSwap(name[i], name[cmp]);
+            FloatSwap(&score[i], &score[cmp]);
+        }
+    }
 }
 
 void AsSortbyNum(long num[], float score[], int n)
@@ -249,17 +289,96 @@ void SortbyNum(long num[], float score[], int n, int(*compare)(int a, int b))
     }
 }
 
-int SearchbyNum(long num[], long x, int n)
+void SortbyNum(long num[], char name[][MAX_LEN], float score[], int n, int(*compare)(int a, int b))
 {
-    //顺序查找
-    for (int i = 0; i < n; i++)
+    //选择排序，第一层循环整个数组，每次归一位
+    for (int i = 0; i < n - 1; i++)
     {
-        if (x == num[i])
+        int cmp = i;//最大位索引值，初试为乱序区第一位
+        //第二层循环乱序位，每次从乱序列中选择学号最小的一位
+        for (int j = i + 1; j < n; j++)
         {
-            return i;
+            if ((*compare)(num[cmp], num[j]))
+            {
+                cmp = j;
+            }
+        }
+        //发生改变，交换
+        if (i != cmp)
+        {
+            LongSwap(&num[i], &num[cmp]);
+            CharSwap(name[i], name[cmp]);
+            FloatSwap(&score[i], &score[cmp]);
         }
     }
-    return -1;
+}
+
+void SortbyName(long num[], char name[][MAX_LEN], float score[], int n)
+{
+    //选择排序，第一层循环整个数组，每次归一位
+    for (int i = 0; i < n - 1; i++)
+    {
+        int cmp = i;//最大位索引值，初试为乱序区第一位
+        //第二层循环乱序位，每次从乱序列中选择字典顺序靠前的一位
+        for (int j = i + 1; j < n; j++)
+        {
+            if (strcmp(name[cmp],name[j])>0)//对比位比乱序位大，不行要换，保持对比位最小（升序）
+            {
+                cmp = j;
+            }
+        }
+        //发生改变，交换
+        if (i != cmp)
+        {
+            LongSwap(&num[i], &num[cmp]);
+            CharSwap(name[i], name[cmp]);
+            FloatSwap(&score[i], &score[cmp]);
+        }
+    }
+}
+
+int SearchbyNum(long num[], char name[][MAX_LEN], float score[], int n)
+{
+    int rank = -1;//学生排名
+    int x;//被查询学号
+    while (true)
+    {
+        printf("Please enter the student ID queried\n");
+        scanf_s("%d", &x);
+        SortbyScore(num, name, score, n, Descending);//先排序
+        //顺序查找
+        for (int i = 0; i < n; i++)
+        {
+            if (x == num[i])
+            {
+                printf("name:%-10s rank:%-10d grade:%-10f\n", name[i], i + 1, score[i]);//索引+1为排名
+                return i;
+            }
+        }
+        printf("Can't find,please checkout again.\n");
+    }
+}
+
+int SearchbyName(long num[], char name[][MAX_LEN], float score[], int n)
+{
+    int rank = -1;//学生排名
+    char x[MAX_LEN];//被查询姓名
+    while (true)
+    {
+        printf("Please enter the student name queried\n");
+        gets_s(x, MAX_LEN);
+        SortbyScore(num, name, score, n, Descending);//先排序
+        //顺序查找
+        for (int i = 0; i < n; i++)
+        {
+            if (strcmp(x, name[i]) == 0)
+            {
+                printf("name:%-10s rank:%-10d grade:%-10f\n", name[i], i + 1, score[i]);//索引+1为排名
+                return i;
+            }
+        }
+        printf("Can't find,please checkout again.\n");
+    }
 }
 
 void StatistAnalysis(float score[], int n)
@@ -302,7 +421,16 @@ void PrintScore(long num[], float score[], int n)
     printf("学号      成绩      \n");
     for (int i = 0; i < n; i++)
     {
-        printf("%d      %f      \n", num[i], score[i]);
+        printf("%-10d%-10f\n", num[i], score[i]);
+    }
+}
+
+void PrintScore(long num[], char name[][MAX_LEN], float score[], int n)
+{
+    printf("%-10s%-10s%-10s\n","学号","姓名","成绩");
+    for (int i = 0; i < n; i++)
+    {
+        printf("%-10d%-10s%-10f\n", num[i], name[i], score[i]);
     }
 }
 
@@ -318,4 +446,22 @@ void LongSwap(long* a, long* b)
     long tmp = *a;
     *a = *b;
     *b = tmp;
+}
+
+void CharSwap(char a[], char b[])
+{
+    char tmp[MAX_LEN];
+    strcpy_s(tmp, MAX_LEN, a);
+    strcpy_s(a, MAX_LEN, b);
+    strcpy_s(b, MAX_LEN, tmp);
+}
+
+int Ascending(int a, int b)
+{
+    return a > b;
+}
+
+int Descending(int a, int b)
+{
+    return a < b;
 }
