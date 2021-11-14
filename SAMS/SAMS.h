@@ -137,6 +137,26 @@ int SearchbyName(STU students[], int n, int m);
 备注：*/
 void StatistAnalysis(STU students[], int n, int m);
 /*
+函数名称:   WritetoFile
+功能描述:   将每个学生的记录信息写入文件
+参数:
+    STU students:学生结构体数组
+    n:总人数
+    m:课程总数
+返回：
+备注：*/
+void WritetoFile(STU students[], int n, int m);
+/*
+函数名称:   ReadfromFile
+功能描述:   从文件中读出每个学生的记录信息并显示
+参数:
+    STU students:学生结构体数组
+    n:总人数
+    m:课程总数
+返回：
+备注：*/
+void ReadfromFile(STU students[], int n, int m);
+/*
 函数名称:   PrintScore
 功能描述:   打印每位学生的学号，姓名和成绩
 参数:

@@ -1,10 +1,11 @@
 /*程序功能:   学生成绩管理
 编码者:   JackieFeng
-日期:  13/11/2021
-版本号:5.0
+日期:  14/11/2021
+版本号:6.0
 备注：
 某班有最多不超过30人(具体人数由键盘输入）参加期末考试，考试科目最多不超过6门（具体门数由键盘输入）。
-定义结构体类型，用结构体数组作函数参数编程实现如下菜单驱动的学生成绩管理系统：
+学生成绩管理系统是一个非常实用的程序，如果能把用户输入的数据存盘，下次运行时独处，就更有用了。
+增加文件读写的功能编程实现如下菜单驱动的学生成绩管理系统：
 (1)录入每个学生的学号，姓名和各科考试成绩；
 (2)计算每门课程的总分和平均分；
 (3)计算每个学生的总分和平均分
@@ -15,7 +16,9 @@
 (8)按学号查询学生排名及其各科考试成绩；
 (9)按姓名查询学生排名及其各科考试成绩；
 (10)按优秀(90- 100)、良好(80- 89)、中等(70-79)、及格(60- 69)、不及格（0-59)5个类别,对每门课程分别统计每个类别的人数以及所占的百分比;
-(11)输出每个学生的学号、姓名，各科考试成绩，总分，平均分，以及每门课程的总分和平均分。*/
+(11)输出每个学生的学号、姓名，各科考试成绩，总分，平均分，以及每门课程的总分和平均分。
+(12)将每个学生的记录信息写入文件。
+(13)从文件中读出每个学生的记录信息并显示。*/
 #include <stdio.h>
 #include "SAMS.h"
 #include <string.h>
@@ -44,8 +47,8 @@ int main()
     /*这次改变了一个字段，将一维的课程升级为了二维数组，
     又新增了一个功能统计每个学生所有课程的平均分和总分，
     所以需要新增两个一维数组sum[],aver[]存储一下此信息.*/
-    float sum[STU_NUM] = { 0 };
-    float aver[STU_NUM] = { 0 };
+   /* float sum[STU_NUM] = { 0 };
+    float aver[STU_NUM] = { 0 };*/
     //AverSumofEveryStudent(score2, sum, aver, n, m);
 
     //初始化结构体数组数据
@@ -116,6 +119,16 @@ int main()
             PrintScore(students, n, m);
             AverSumofEveryCourse(students, n, m);
             break;
+        case 12://将每个学生的记录信息写入文件。
+            puts("正在写入students.txt文件");
+            WritetoFile(students, n, m);
+            break;
+        case 13://从文件中读出每个学生的记录信息并显示。
+            STU  studentsNew[STU_NUM];
+            ReadfromFile(studentsNew, n, m);
+            puts("新文件内容如下");
+            PrintScore(studentsNew, n, m);
+            break;
         case 0://退出系统
             printf("Good Bye!\n");
             exit(0);//建议main函数用exit(0)表示正常结束
@@ -139,34 +152,11 @@ int Mean(void)
     printf("9.Search by name\n");
     printf("10.Statistic analysis\n");
     printf("11.List record\n");
+    printf("12.Write to a file\n");
+    printf("13.Read from a file\n");
     printf("0.Exit\n");
     printf("666.Show mean\n");
     return 0;
-}
-
-int ReadScore(long num[], char name[][MAX_LEN], float score[][COURSE_NUM], int n, int m)
-{
-    printf("正在录入学生信息...\n");
-    printf("学号录入-1时结束录入\n");
-    int i = n - 1;
-    do
-    {
-        i++;
-        printf("正在录入第%d个学生的学号,姓名\n", i + 1);
-        //scanf("%ld%s%f", &num[i], name[i], &score[i]);//数值类型与字符串类型交叉输入可用空格隔开
-        scanf_s("%ld", &num[i]);
-        if (num[i] == -1)//若用户输入完毕则退出输入
-            break;
-        scanf_s("%s", name[i], 10);//scanf_s函数在输入字符串时必须指定字符串长度
-        getchar();//读走回车符
-        printf("请连续按顺序输入第%d个学生%d课成绩\n", i + 1, m);
-        for (int j = 0; j < m; j++)
-        {
-            scanf_s("%f", &score[i][j]);
-        }
-    } while (i <= 30);
-    printf("录入完成总共录入%d人\n", i);
-    return i;
 }
 
 int ReadScore(STU students[], int n, int m)
@@ -194,22 +184,6 @@ int ReadScore(STU students[], int n, int m)
     return i;
 }
 
-void AverSumofEveryCourse(float score[][COURSE_NUM], int n, int m)
-{
-    float sum[COURSE_NUM] = { 0 };
-    float aver[COURSE_NUM] = { 0 };
-    //i行j列，算课程总分，按列算总和
-    for (int j = 0; j < m; j++)
-    {
-        for (int i = 0; i < n; i++)
-        {
-            sum[j] += score[i][j];
-        }
-        aver[j] = sum[j] / n;
-        printf("科目%d的总分为%.2f,平均分为%.2f\n", j + 1, sum[j], aver[j]);
-    } 
-}
-
 void AverSumofEveryCourse(STU students[], int n, int m)
 {
     float sum[COURSE_NUM] = { 0 };
@@ -226,18 +200,6 @@ void AverSumofEveryCourse(STU students[], int n, int m)
     }
 }
 
-void AverSumofEveryStudent(float score[][COURSE_NUM], float sum[], float aver[], int n, int m)
-{
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < m; j++)
-        {
-            sum[i] += score[i][j];
-        }
-        aver[i] = sum[i] / m;
-    }
-}
-
 void AverSumofEveryStudent(STU students[], int n, int m)
 {
     for (int i = 0; i < n; i++)
@@ -248,35 +210,6 @@ void AverSumofEveryStudent(STU students[], int n, int m)
             students[i].sum += students[i].score[j];
         }
         students[i].aver = students[i].sum / m;
-    }
-}
-
-void SortbyScore(long num[], char name[][MAX_LEN], float score[][COURSE_NUM], float sum[], float aver[], int n, int m, int(*compare)(int a, int b))
-{
-    //选择排序，第一层循环整个数组，每次归一位
-    for (int i = 0; i < n - 1; i++)
-    {
-        int cmp = i;//比较位索引值，初始为乱序区第一位
-        //第二层循环乱序位，每次从乱序列中选择最大一位
-        for (int j = i; j < n; j++)
-        {
-            if (compare(sum[cmp], sum[j]))//比总分
-            {
-                cmp = j;
-            }
-        }
-        //发生改变，交换
-        if (i != cmp)
-        {
-            LongSwap(&num[i], &num[cmp]);
-            CharSwap(name[i], name[cmp]);
-            FloatSwap(&sum[i], &sum[cmp]);
-            FloatSwap(&aver[i], &aver[cmp]);
-			for (int j = 0; j < m; j++)
-			{
-				FloatSwap(&score[i][j], &score[cmp][j]);
-			}
-        }
     }
 }
 
@@ -304,35 +237,6 @@ void SortbyScore(STU students[], int n, int m, int(*compare)(int a, int b))
             for (int j = 0; j < m; j++)
             {
                 FloatSwap(&students[i].score[j], &students[cmp].score[j]);
-            }
-        }
-    }
-}
-
-void SortbyNum(long num[], char name[][MAX_LEN], float score[][COURSE_NUM], float sum[], float aver[], int n, int m, int(*compare)(int a, int b))
-{
-    //选择排序，第一层循环整个数组，每次归一位
-    for (int i = 0; i < n - 1; i++)
-    {
-        int cmp = i;//最大位索引值，初试为乱序区第一位
-        //第二层循环乱序位，每次从乱序列中选择学号最小的一位
-        for (int j = i + 1; j < n; j++)
-        {
-            if ((*compare)(num[cmp], num[j]))
-            {
-                cmp = j;
-            }
-        }
-        //发生改变，交换
-        if (i != cmp)
-        {
-            LongSwap(&num[i], &num[cmp]);
-            CharSwap(name[i], name[cmp]);
-            FloatSwap(&sum[i], &sum[cmp]);
-            FloatSwap(&aver[i], &aver[cmp]);
-            for (int j = 0; j < m; j++)
-            {
-                FloatSwap(&score[i][j], &score[cmp][j]);
             }
         }
     }
@@ -367,35 +271,6 @@ void SortbyNum(STU students[], int n, int m, int(*compare)(int a, int b))
     }
 }
 
-void SortbyName(long num[], char name[][MAX_LEN], float score[][COURSE_NUM], float sum[], float aver[], int n, int m)
-{
-     //选择排序，第一层循环整个数组，每次归一位
-    for (int i = 0; i < n - 1; i++)
-    {
-        int cmp = i;//最大位索引值，初试为乱序区第一位
-        //第二层循环乱序位，每次从乱序列中选择字典顺序靠前的一位
-        for (int j = i + 1; j < n; j++)
-        {
-            if (strcmp(name[cmp],name[j])>0)//对比位比乱序位大，不行要换，保持对比位最小（升序）
-            {
-                cmp = j;
-            }
-        }
-        //发生改变，交换
-        if (i != cmp)
-        {
-            LongSwap(&num[i], &num[cmp]);
-            CharSwap(name[i], name[cmp]);
-            FloatSwap(&sum[i], &sum[cmp]);
-            FloatSwap(&aver[i], &aver[cmp]);
-            for (int j = 0; j < m; j++)
-            {
-                FloatSwap(&score[i][j], &score[cmp][j]);
-            }
-        }
-    }
-}
-
 void SortbyName(STU students[], int n, int m)
 {
     //选择排序，第一层循环整个数组，每次归一位
@@ -425,33 +300,6 @@ void SortbyName(STU students[], int n, int m)
     }
 }
 
-int SearchbyNum(long num[], char name[][MAX_LEN], float score[][COURSE_NUM], float sum[], float aver[], int n, int m)
-{
-    int rank = -1;//学生排名
-    int x;//被查询学号
-    while (true)
-    {
-        printf("Please enter the student ID queried\n");
-        scanf_s("%d", &x);
-        SortbyScore(num, name, score, sum, aver, n, m, Descending);//先排序
-        //顺序查找
-        for (int i = 0; i < n; i++)
-        {
-            if (x == num[i])
-            {
-                printf("name:%-10s rank:%-10d", name[i], i + 1);//索引+1为排名
-                for (int j = 0; j < m; j++)
-                {
-                    printf("科目%d:%-10.1f", j + 1, score[i][j]);
-                }
-                printf("\n");
-                return i;
-            }
-        }
-        printf("Can't find,please checkout again.\n");
-    }
-}
-
 int SearchbyNum(STU students[], int n, int m)
 {
     int rank = -1;//学生排名
@@ -470,33 +318,6 @@ int SearchbyNum(STU students[], int n, int m)
                 for (int j = 0; j < m; j++)
                 {
                     printf("科目%d:%-10.1f", j + 1, students[i].score[j]);
-                }
-                printf("\n");
-                return i;
-            }
-        }
-        printf("Can't find,please checkout again.\n");
-    }
-}
-
-int SearchbyName(long num[], char name[][MAX_LEN], float score[][COURSE_NUM], float sum[], float aver[], int n, int m)
-{
-    int rank = -1;//学生排名
-    char x[MAX_LEN];//被查询姓名
-    while (true)
-    {
-        printf("Please enter the student name queried\n");
-        gets_s(x, MAX_LEN);
-        SortbyScore(num, name, score, sum, aver, n, m, Descending);//先排序
-        //顺序查找
-        for (int i = 0; i < n; i++)
-        {
-            if (strcmp(x, name[i]) == 0)
-            {
-                printf("name:%-10s rank:%-10d", name[i], i + 1);//索引+1为排名
-                for (int j = 0; j < m; j++)
-                {
-                    printf("科目%d:%-10.1f", j + 1, score[i][j]);
                 }
                 printf("\n");
                 return i;
@@ -530,46 +351,6 @@ int SearchbyName(STU students[], int n, int m)
             }
         }
         printf("Can't find,please checkout again.\n");
-    }
-}
-
-void StatistAnalysis(float score[][COURSE_NUM], int n, int m)
-{
-    for (int j = 0; j < m; j++)//统计每门课
-    {
-        printf("科目%d情况如下：\n", j+1);
-
-        int ranks[5] = { 0 };// 各种档次的人数，首位赋值为0，后续位补充为0
-        for (int i = 0; i < n; i++)//遍历整个成绩，统计数据
-        {
-            if (score[i][j] < 60)
-            {
-                ranks[0]++;
-            }
-            else if (score[i][j] < 70 && score[i][j] >= 60)
-            {
-                ranks[1]++;
-            }
-            else if (score[i][j] < 80 && score[i][j] >= 70)
-            {
-                ranks[2]++;
-            }
-            else if (score[i][j] < 90 && score[i][j] >= 80)
-            {
-                ranks[3]++;
-            }
-            else//90到100档
-            {
-                ranks[4]++;
-            }
-        }
-        //输出统计数据
-		printf("%-10s%-10s%-10s\n", "rank ", "amount", "percent");
-		printf("%-10s%-10d%.0f%%\n", "0-59 ", ranks[0], ranks[0] / (float)n * 100);
-		printf("%-10s%-10d%.0f%%\n", "60-69", ranks[1], ranks[1] / (float)n * 100);
-		printf("%-10s%-10d%.0f%%\n", "70-79", ranks[2], ranks[2] / (float)n * 100);
-		printf("%-10s%-10d%.0f%%\n", "80-89", ranks[3], ranks[3] / (float)n * 100);
-		printf("%-10s%-10d%.0f%%\n", "90-100", ranks[4], ranks[4] / (float)n * 100);
     }
 }
 
@@ -613,18 +394,35 @@ void StatistAnalysis(STU students[], int n, int m)
     }
 }
 
-void PrintScore(long num[], char name[][MAX_LEN], float score[][COURSE_NUM], float sum[], float aver[], int n, int m)
+void WritetoFile(STU students[], int n, int m)
 {
-    printf("%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n", "学号", "姓名", "科目一", "科目二", "科目三", "总分", "平均分");
-    for (int i = 0; i < n; i++)
+    FILE* fp;
+    if (fopen_s(&fp,"students.txt", "w") != 0)
     {
-        printf("%-10d%-10s", num[i], name[i]);
-        for (int j = 0; j < m; j++)
-        {
-            printf("%-10.1f", score[i][j]);
-        }
-        printf("%-10.1f%-10.1f", sum[i], aver[i]);
-        printf("\n");
+        puts("文件打开失败");
+        exit(0);
+    }
+    else//按数据块读写文件
+    {
+        int num = fwrite(students, sizeof(STU), n, fp);
+        printf("成功写入%d条数据\n", num);
+        fclose(fp);
+    }
+}
+
+void ReadfromFile(STU students[], int n, int m)
+{
+    FILE* fp;
+    if (fopen_s(&fp, "students.txt", "r") != 0)
+    {
+        puts("文件打开失败");
+        exit(0);
+    }
+    else//按数据块读写文件
+    {
+        int num = fread(students, sizeof(STU), n, fp);
+        printf("成功写入%d条数据\n", num);
+        fclose(fp);
     }
 }
 

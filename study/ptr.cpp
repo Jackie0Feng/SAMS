@@ -55,8 +55,5 @@ void allocTest()
 		printf("%d", p[i]);
 	}
 }
-int main()
-{
-	return 0;
-}
+
 
